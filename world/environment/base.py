@@ -90,6 +90,7 @@ class BaseEnv:
         def step():
             p.setJointMotorControl2(self.scene["pusher"], 1, p.POSITION_CONTROL, targetPosition=-1,
                                     force=action.force, maxVelocity=self.config["pusher_lin_vel"])
+            print("hello")
             p.stepSimulation()
 
         if self.config["realtime"]:
@@ -102,6 +103,8 @@ class BaseEnv:
             i = 0
             while i < self.config["simulation_action_steps"]:
                 step()
+                imu_states = p.getLinkStates(2,[3,4,5,6])
+                print(imu_states)
                 i += 1
 
     def start_sim(self):
