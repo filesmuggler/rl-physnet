@@ -9,7 +9,7 @@ ENV_CONFIG = yaml.safe_load(open("../config/demo.yaml", 'r'))
 
 if __name__ == "__main__":
     myenv = world.environment.pusher.PusherEnvDemo(ENV_CONFIG)
-    myenv.rog.object_types = ['cube.obj']
+    myenv.rog.object_types = ['/home/krzysztof/Repos/rl-physnet/objects/cube.obj']
     myenv.reset()
 
     for _ in range(NUM_EPISODES):

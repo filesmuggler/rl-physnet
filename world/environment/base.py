@@ -146,6 +146,12 @@ class BaseEnv:
         base = p.createCollisionShape(p.GEOM_BOX, halfExtents=[0.1, 0.1, 0.1])
         link = p.createCollisionShape(p.GEOM_BOX, halfExtents=[0.1, 0.02, 0.02])
         pusher = p.createCollisionShape(p.GEOM_BOX, halfExtents=[0.02, 0.05, 0.1])
+        # imu blocks according to the design of pisa foot
+        front_imu = p.createCollisionShape(p.GEOM_BOX, halfExtents=[0.01,0.01,0.01])
+        back_imu = p.createCollisionShape(p.GEOM_BOX, halfExtents=[0.01,0.01,0.01])
+        perp_imu = p.createCollisionShape(p.GEOM_BOX, halfExtents=[0.01,0.01,0.01])
+        hor_imu = p.createCollisionShape(p.GEOM_BOX, halfExtents=[0.01,0.01,0.01])
+
 
         # pusher position around the object on a circle
         pos_offset = self.config["object_position"] + np.array(object_pos) \
@@ -160,16 +166,16 @@ class BaseEnv:
         baseMass = 0  # fixed base
         baseCollisionShapeIndex = base
         baseVisualShapeIndex = -1
-        linkMasses = [self.config["pusher_link_mass"]] * 3
-        linkCollisionShapeIndices = [-1, link, pusher]
-        linkVisualShapeIndices = [-1, link, pusher]
-        linkPositions = [[0, 0, 0], [-0.1, 0, 0], [-0.1, 0, 0]]
-        linkOrientations = [[0, 0, 0, 1], [0, -0.0663219, 0, 0.9977983], [0, 0, 0, 1]]
+        linkMasses = [self.config["pusher_link_mass"],0.5,0.3,0.05,0.05,0.05,0.05]
+        linkCollisionShapeIndices = [-1, link, pusher, front_imu, back_imu, perp_imu,hor_imu]
+        linkVisualShapeIndices = [-1, link, pusher, front_imu, back_imu, perp_imu, hor_imu]
+        linkPositions = [[0, 0, 0], [-0.1, 0, 0], [-0.1, 0, 0],[0,0,0.1],[0,0,-0.2],[0.03,0,0.075],[0,0,0.05]]
+        linkOrientations = [[0, 0, 0, 1], [0, -0.0663219, 0, 0.9977983], [0, 0, 0, 1],[0,0,0,1],[0,0,0,1],[0,0,0,1],[0,0,0,1]]
         linkInertialFramePositions = linkPositions
         linkInertialFrameOrientations = linkOrientations
-        linkParentIndices = [0, 1, 2]
-        linkJointTypes = [p.JOINT_FIXED, p.JOINT_PRISMATIC, p.JOINT_REVOLUTE]
-        linkJointAxis = [[0, 0, 1], [1, 0, 0], [0, 1, 0]]
+        linkParentIndices = [0, 1, 2, 3, 4, 5, 6]
+        linkJointTypes = [p.JOINT_FIXED, p.JOINT_PRISMATIC, p.JOINT_REVOLUTE, p.JOINT_FIXED, p.JOINT_FIXED, p.JOINT_FIXED, p.JOINT_FIXED]
+        linkJointAxis = [[0, 0, 1], [1, 0, 0], [0, 1, 0],[0,0,1],[0,0,1],[0,1,0],[0,1,0]]
 
         pusher_id = p.createMultiBody(baseMass=baseMass,
                                       baseCollisionShapeIndex=baseCollisionShapeIndex,
