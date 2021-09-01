@@ -76,18 +76,13 @@ class BaseEnv:
         if action is not None:
             # apply force on a pusher object
             imu_states = self.step_sim_with_force(action)
-            #imus_before = self.process_imu(imu_states)
+            imus = self.process_imu(imu_states)
 
             state_after = p.getBasePositionAndOrientation(self.object)
             observations.append(state_after)
 
-            # wait more and get new observation
-            # imu_states = self.step_sim_with_force(action)
-            # imus_after = self.process_imu(imu_states)
-            state_post_after = p.getBasePositionAndOrientation(self.object)
-            observations.append(state_post_after)
 
-        return observations,imus_before,imus_after
+        return observations,imus
 
     def step_sim_with_force(self, action: PushAction):
         def step():

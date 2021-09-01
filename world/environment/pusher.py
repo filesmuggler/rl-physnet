@@ -28,14 +28,14 @@ class PusherEnvDemo(BaseEnv):
         observations, reward, done, info = list(), None, False, {}
 
         info["haptic"] = self.rog.get_haptic_values()
-        observations,imus_before,imus_after = self.get_observations(action)
+        observations,imus = self.get_observations(action)
         observations = np.asarray([np.hstack(o) for o in observations])
 
         obs_flat = observations.reshape((1, -1))
         act_flat = action.to_numpy().reshape((1, -1))
         info["observations_numpy"] = (obs_flat, act_flat)
 
-        return observations, reward, done, info, imus_before, imus_after
+        return observations, reward, done, info, imus
 
     def reset(self):
         self.reset_sim()
