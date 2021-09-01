@@ -13,21 +13,26 @@ ENV_CONFIG = yaml.safe_load(open("../config/gather_data.yaml", 'r'))
 
 
 def create_dataset(myenv, file, n_episodes, n_actions):
-    dataset = {"observations": list(), "actions": list(), "y": list()}
+    dataset = {"observations": list(), "actions": list(), "y": list(), "imu_before": list(), "imu_after": list()}
     for n_ep in range(n_episodes):
         batch_obs, batch_act, batch_y = list(), list(), list()
+        batch_imu_before, batch_imu_after = list(), list()
         for n_act in range(n_actions):
             action = world.action.primitives.PushAction.random_sample()
-            observations, _, _, info = myenv.step(action=action)
+            observations, _, _, info, imus_before, imus_after = myenv.step(action=action)
             batch_obs.append(info["observations_numpy"][0])
             batch_act.append(info["observations_numpy"][1])
             batch_y.append(asarray([v for v in info["haptic"].values()]))
+            batch_imu_before.append(imus_before)
+            batch_imu_after.append(imus_after)
 
         # dump data after each episode and restart an environment
         log(TextFlag.INFO, "Finished episode {}".format(n_ep))
         dataset['observations'].append(concatenate(batch_obs, 0))
         dataset['actions'].append(concatenate(batch_act, 0))
         dataset['y'].append(asarray(batch_y))
+        dataset['imu_before'].append(batch_imu_before)
+        dataset['imu_after'].append(batch_imu_after)
         myenv.reset()
     np.save(file, dataset)
 
@@ -50,7 +55,7 @@ def start(args):
         create_dataset(myenv, ftrain, args.n_episodes_train, args.n_actions)
 
     # generate a test dataset with a different object shape
-    myenv.rog.object_types = ['stone_2.obj']
+    myenv.rog.object_types = ['/home/krzysztof/Repos/rl-physnet/objects/stone_2.obj']
     myenv.reset()
     with open(test_file, 'wb') as ftest:
         create_dataset(myenv, ftest, args.n_episodes_test, args.n_actions)
@@ -62,7 +67,7 @@ if __name__ == "__main__":
     parser = ArgumentParser()
 
     parser.add_argument('--data-path', type=str,
-                        default="/media/mbed/internal/backup/rl-physnet/train5000_test500x10")
+                        default="./rl-physnet_dataset/train5000_test500x10")
     parser.add_argument('--data-file', type=str, default="data")
     parser.add_argument('--n-episodes-train', type=int, default=5000)
     parser.add_argument('--n-episodes-test', type=int, default=500)

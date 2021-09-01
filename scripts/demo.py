@@ -15,7 +15,7 @@ if __name__ == "__main__":
     for _ in range(NUM_EPISODES):
         for _ in range(NUM_ACTIONS):
             action = world.action.primitives.PushAction.random_sample()
-            observations, reward, done, info = myenv.step(action=action)
+            observations, reward, done, info, imus_before, imus_after = myenv.step(action=action)
             log(TextFlag.INFO, info["observations_numpy"])
 
         myenv.reset()

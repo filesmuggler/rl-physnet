@@ -75,24 +75,27 @@ class BaseEnv:
 
         if action is not None:
             # apply force on a pusher object
-            self.step_sim_with_force(action)
+            imu_states = self.step_sim_with_force(action)
+            imus_before = self.process_imu(imu_states)
+
             state_after = p.getBasePositionAndOrientation(self.object)
             observations.append(state_after)
 
             # wait more and get new observation
-            self.step_sim_with_force(action)
+            imu_states = self.step_sim_with_force(action)
+            imus_after = self.process_imu(imu_states)
             state_post_after = p.getBasePositionAndOrientation(self.object)
             observations.append(state_post_after)
 
-        return observations
+        return observations,imus_before,imus_after
 
     def step_sim_with_force(self, action: PushAction):
         def step():
             p.setJointMotorControl2(self.scene["pusher"], 1, p.POSITION_CONTROL, targetPosition=-1,
                                     force=action.force, maxVelocity=self.config["pusher_lin_vel"])
-            print("hello")
             p.stepSimulation()
 
+        imu_states = []
         if self.config["realtime"]:
             t_start = time.time()
             t_end = t_start + self.config["simulation_action_steps"] * self.config["simulation_timestep"]
@@ -101,11 +104,21 @@ class BaseEnv:
                 time.sleep(self.config["simulation_timestep"])
         else:
             i = 0
+            imu_step_states = []
             while i < self.config["simulation_action_steps"]:
                 step()
-                imu_states = p.getLinkStates(2,[3,4,5,6])
-                print(imu_states)
+                #TODO: get link states
+                imu_step_states.append(p.getLinkStates(2,[3,4,5,6]))
                 i += 1
+            imu_states = imu_step_states
+
+        #preprocess imus
+        imus = [[], [], [], []]
+        for entry in imu_states:
+            for i, imu_unit in enumerate(entry):
+                imus[i].append(imu_unit[1])
+
+        return imus
 
     def start_sim(self):
         if self.config["simulation_use_gui"]:
@@ -249,3 +262,13 @@ class BaseEnv:
             np_img_arr = np_img_arr * (1. / 255.)
 
         return np_img_arr
+
+    def process_imu(self,imu_states):
+        imu_1 = np.array(imu_states[0])
+        imu_2 = np.array(imu_states[1])
+        imu_3 = np.array(imu_states[2])
+        imu_4 = np.array(imu_states[3])
+
+        imus = np.concatenate([imu_1, imu_2, imu_3, imu_4], axis=1)
+
+        return imus
