@@ -102,7 +102,6 @@ class BaseEnv:
             imu_step_states = []
             while i < self.config["simulation_action_steps"]:
                 step()
-                #TODO: get link states
                 imu_step_states.append(p.getLinkStates(2,[3,4,5,6]))
                 i += 1
             imu_states = imu_step_states

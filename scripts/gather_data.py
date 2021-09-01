@@ -14,28 +14,25 @@ ENV_CONFIG = yaml.safe_load(open("../config/gather_data.yaml", 'r'))
 
 
 def create_dataset(myenv, file, n_episodes, n_actions):
-    dataset = {"observations": list(), "actions": list(), "y": list(), "imu_before": list(), "imu_after": list()}
+    dataset = {"observations": list(), "actions": list(), "y": list(), "imu": list()}
     for n_ep in range(n_episodes):
         batch_obs, batch_act, batch_y = list(), list(), list()
-        batch_imu_before, batch_imu_after = list(), list()
+        batch_imu = list()
         for n_act in range(n_actions):
             action = world.action.primitives.PushAction.random_sample()
-            observations, _, _, info, imus_before, imus_after = myenv.step(action=action)
+            observations, _, _, info, imus = myenv.step(action=action)
             batch_obs.append(info["observations_numpy"][0])
             batch_act.append(info["observations_numpy"][1])
             batch_y.append(asarray([v for v in info["haptic"].values()]))
-            batch_imu_before.append(imus_before)
-            batch_imu_after.append(imus_after)
+            batch_imu.append(imus)
 
         # dump data after each episode and restart an environment
         log(TextFlag.INFO, "Finished episode {}".format(n_ep))
         dataset['observations'].append(concatenate(batch_obs, 0))
         dataset['actions'].append(concatenate(batch_act, 0))
         dataset['y'].append(asarray(batch_y))
-        dataset['imu_before'].append(batch_imu_before)
-        dataset['imu_after'].append(batch_imu_after)
+        dataset['imu'].append(batch_imu)
         myenv.reset()
-    #np.save(file, dataset)
     pickle.dump(dataset,file)
 
 
