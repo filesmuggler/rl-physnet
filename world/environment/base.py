@@ -72,18 +72,18 @@ class BaseEnv:
         state_before = p.getBasePositionAndOrientation(self.object)
         self.scene["pusher"] = self.setup_pusher(object_pos=state_before[0], action=action)
         observations.append(state_before)
-
+        imus_before, imus_after = list(), list()
         if action is not None:
             # apply force on a pusher object
             imu_states = self.step_sim_with_force(action)
-            imus_before = self.process_imu(imu_states)
+            #imus_before = self.process_imu(imu_states)
 
             state_after = p.getBasePositionAndOrientation(self.object)
             observations.append(state_after)
 
             # wait more and get new observation
-            imu_states = self.step_sim_with_force(action)
-            imus_after = self.process_imu(imu_states)
+            # imu_states = self.step_sim_with_force(action)
+            # imus_after = self.process_imu(imu_states)
             state_post_after = p.getBasePositionAndOrientation(self.object)
             observations.append(state_post_after)
 

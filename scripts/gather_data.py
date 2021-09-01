@@ -8,6 +8,7 @@ from numpy import asarray, concatenate
 
 import world
 from utils.text import TextFlag, log
+import pickle
 
 ENV_CONFIG = yaml.safe_load(open("../config/gather_data.yaml", 'r'))
 
@@ -34,7 +35,8 @@ def create_dataset(myenv, file, n_episodes, n_actions):
         dataset['imu_before'].append(batch_imu_before)
         dataset['imu_after'].append(batch_imu_after)
         myenv.reset()
-    np.save(file, dataset)
+    #np.save(file, dataset)
+    pickle.dump(dataset,file)
 
 
 def start(args):
@@ -45,8 +47,8 @@ def start(args):
 
     # save data for test and train
     mytime = int(time.time())
-    train_file = os.path.join(args.data_path, "{}_{}.npy".format("train", mytime))
-    test_file = os.path.join(args.data_path, "{}_{}.npy".format("test", mytime))
+    train_file = os.path.join(args.data_path, "{}_{}.pkl".format("train", mytime))
+    test_file = os.path.join(args.data_path, "{}_{}.pkl".format("test", mytime))
 
     # generate train dataset with a cube shape
     myenv.rog.object_types = ['cube.obj']
