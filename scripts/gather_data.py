@@ -66,12 +66,12 @@ if __name__ == "__main__":
     parser = ArgumentParser()
 
     parser.add_argument('--data-path', type=str,
-                        default="./rl-physnet_dataset/train5000_test500x10")
+                        default="./rl-physnet_dataset/imu_train500_test100x100")
     parser.add_argument('--data-file', type=str, default="data")
-    parser.add_argument('--n-episodes-train', type=int, default=5000)
-    parser.add_argument('--n-episodes-test', type=int, default=500)
-    parser.add_argument('--n-actions', type=int, default=10)
+    parser.add_argument('--n-episodes-train', type=int, default=500)
+    parser.add_argument('--n-episodes-test', type=int, default=100)
+    parser.add_argument('--n-actions', type=int, default=100)
     args, _ = parser.parse_known_args()
-    world.physics.utils.allow_memory_growth()
+    #world.physics.utils.allow_memory_growth()
 
     start(args)
