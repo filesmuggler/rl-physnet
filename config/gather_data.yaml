@@ -1,5 +1,5 @@
 simulation_timestep: 0.01666666666  # simulation settings
-simulation_action_steps: 150
+simulation_action_steps: 20
 simulation_use_gui: False
 realtime: False
 
